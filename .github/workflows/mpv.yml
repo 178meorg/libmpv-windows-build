@@ -51,6 +51,11 @@ on:
       command:
         description: 'input command you want to run before build'
         required: false
+      command_only:
+        description: 'Run only the custom command after configure and skip the full mpv build'
+        required: false
+        default: false
+        type: boolean
       prs:
         description: "Input the pr numbers of mpv,split items by comma(',')"
         required: false
@@ -337,11 +342,19 @@ jobs:
               done
             fi
           done
+      - name: Apply local patches
+        run: |
+          cd mpv-winbuild-cmake
+          if [[ "$(ls -A ../patch/*.patch)" ]]; then
+            for patch in ../patch/*.patch ; do
+              git am --3way "$patch" || git am --abort
+            done
+          fi
 
       - name: Running custom command
         if: ${{ inputs.command != '' }}
         shell: bash
-        continue-on-error: true
+        continue-on-error: ${{ inputs.command_only != true }}
         run: |
           cd mpv-winbuild-cmake
           bit="${{ matrix.bit }}"
@@ -363,6 +376,10 @@ jobs:
           elif [ $bit == "aarch64" ]; then
               arch="aarch64"
           fi
+          if [ "$compiler" == "clang" ]; then
+            clang_option=(-DCMAKE_INSTALL_PREFIX=$clang_root -DMINGW_INSTALL_PREFIX=$buildroot/build$bit/install/$arch-w64-mingw32 -DCLANG_PACKAGES_LTO=ON)
+          fi
+          cmake -Wno-dev --fresh -DTARGET_ARCH=$arch-w64-mingw32 $gcc_arch -DCOMPILER_TOOLCHAIN=$compiler "${clang_option[@]}" -DENABLE_CCACHE=ON -DSINGLE_SOURCE_LOCATION=$srcdir -DRUSTUP_LOCATION=$buildroot/install_rustup -G Ninja -H$gitdir -B$buildroot/build$bit
           retry-tool() {
             local RETRY_COUNTER=0
             local MAX_RETRY=3
@@ -378,16 +395,12 @@ jobs:
           set -x
           ${{ inputs.command }}
       - name: Build
+        if: ${{ inputs.command_only != true }}
         id: build
         shell: bash
         run: |
           chmod +x build.sh
           cd mpv-winbuild-cmake
-          if [[ "$(ls -A ../patch/*.patch)" ]]; then
-            for patch in ../patch/*.patch ; do
-              git am --3way "$patch" || git am --abort
-            done
-          fi
           if [ "${{ matrix.lgpl }}" = "true" ]; then
             git am --3way ../compile-lgpl-libmpv.patch
           fi
@@ -404,6 +417,7 @@ jobs:
           path: logs.7z
 
       - name: "Get artifacts' name and path"
+        if: ${{ inputs.command_only != true }}
         id: get_files
         uses: actions/github-script@v9
         with:
@@ -444,27 +458,27 @@ jobs:
             await exec.exec(`7z a -m0=lzma2 -mx=9 -ms=on mpv-winbuild-cmake/release/${ffmpeg_name}.7z ${ffmpeg_path}`)
 
       - name: upload mpv-debug
+        if: ${{ inputs.command_only != true && env.mpv-debug_path }}
         uses: actions/upload-artifact@v7
-        if: ${{ env.mpv-debug_path }}
         with:
           path: ${{ env.mpv-debug_path }}
           archive: false
       - name: upload mpv-dev
+        if: ${{ inputs.command_only != true && env.mpv-dev_path }}
         uses: actions/upload-artifact@v7
-        if: ${{ env.mpv-dev_path }}
         with:
           path: ${{ env.mpv-dev_path }}
           archive: false
       - name: upload mpv
+        if: ${{ inputs.command_only != true && env.mpv_path }}
         uses: actions/upload-artifact@v7
-        if: ${{ env.mpv_path }}
         with:
           path: ${{ env.mpv_path }}
           archive: false
           
       - name: upload ffmpeg
+        if: ${{ inputs.command_only != true && env.ffmpeg_name }}
         uses: actions/upload-artifact@v7
-        if: ${{ env.ffmpeg_name }}
         with:
           path: mpv-winbuild-cmake/release/${{ env.ffmpeg_name }}.7z
           archive: false
