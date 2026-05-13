@@ -1,0 +1,40 @@
+From 4d2b4b4b8f3c0f2d6f4b22b0f4c7dfb4f0d4a123 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Wed, 13 May 2026 15:45:00 +0800
+Subject: [PATCH] zimg: switch graphengine and zimg sources to GitHub
+
+Bitbucket no longer serves the repositories used by the upstream package
+definitions, which makes ExternalProject clone steps fail during source
+download. The maintained mirrors live on GitHub under the same project
+owner, so point both package definitions there.
+---
+ packages/graphengine.cmake | 2 +-
+ packages/libzimg.cmake     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/packages/graphengine.cmake b/packages/graphengine.cmake
+index d29239e..c8e15e1 100644
+--- a/packages/graphengine.cmake
++++ b/packages/graphengine.cmake
+@@ -1,5 +1,5 @@
+ ExternalProject_Add(graphengine
+-    GIT_REPOSITORY https://bitbucket.org/the-sekrit-twc/graphengine.git
++    GIT_REPOSITORY https://github.com/sekrit-twc/graphengine.git
+     SOURCE_DIR ${SOURCE_LOCATION}
+     GIT_CLONE_FLAGS "--filter=tree:0"
+     GIT_SUBMODULES ""
+diff --git a/packages/libzimg.cmake b/packages/libzimg.cmake
+index da1ebfa..c4e5569 100644
+--- a/packages/libzimg.cmake
++++ b/packages/libzimg.cmake
+@@ -2,7 +2,7 @@ get_property(src_graphengine TARGET graphengine PROPERTY _EP_SOURCE_DIR)
+ ExternalProject_Add(libzimg
+     DEPENDS
+         graphengine
+-    GIT_REPOSITORY https://bitbucket.org/the-sekrit-twc/zimg.git
++    GIT_REPOSITORY https://github.com/sekrit-twc/zimg.git
+     SOURCE_DIR ${SOURCE_LOCATION}
+     GIT_CLONE_FLAGS "--filter=tree:0"
+     GIT_SUBMODULES ""
+-- 
+2.52.0
