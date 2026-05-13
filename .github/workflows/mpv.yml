@@ -12,14 +12,11 @@ on:
       build_target:
         description: "Build target"
         required: false
-        default: "all-64bit"
+        default: "64bit"
         type: choice
         options:
         - 32bit
         - 64bit
-        - 64bit-v3
-        - aarch64
-        - all-64bit
         - all
       lgpl:
         description: "Also build lgpl libmpv"
@@ -92,20 +89,11 @@ jobs:
               case "64bit":
                 matrix.bit = ["64"];
                 break;
-              case "64bit-v3":
-                matrix.bit = ["64-v3"];
-                break;
-              case "aarch64":
-                matrix.bit = ["aarch64"];
-                break;
-              case "all-64bit":
-                matrix.bit = ["64","64-v3","aarch64"];
-                break;
               case "all":
-                matrix.bit = ["32","64","64-v3","aarch64"];
+                matrix.bit = ["32","64"];
                 break;
               default:
-                matrix.bit = ["64","64-v3","aarch64"];
+                matrix.bit = ["64"];
                 break;
             }
             core.setOutput("matrix_bit",JSON.stringify(matrix));
