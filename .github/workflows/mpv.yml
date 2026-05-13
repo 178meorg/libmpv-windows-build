@@ -653,7 +653,7 @@ jobs:
         with:
           script: |
             const sha = `${{ needs.params.outputs.sha }}`;
-            let note = `**MPV Git commit**: https://github.com/mpv-player/mpv/commit/${sha}\n`;
+            let note = `**MPV Git commit**: https://github.com/178meorg/mpv/commit/${sha}\n`;
             note+="**Build Time**: ${{ env.long_time }}\n";
             note+="**Compiler**: ${{ inputs.compiler }}\n";
             note+="**Build Details**: https://github.com/${{github.repository}}/actions/runs/${{github.run_id}}\n";

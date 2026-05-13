@@ -75,7 +75,7 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   libzimg (with [graphengine](https://github.com/sekrit-twc/graphengine)) [![libzimg](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fsekrit-twc%2Fzimg&cacheSeconds=1800)](https://github.com/sekrit-twc/zimg)
     -   libzvbi [![libzvbi](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fzapping-vbi%2Fzvbi%2Fmain&cacheSeconds=1800)](https://github.com/zapping-vbi/zvbi)
     -   luajit [![luajit](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fopenresty%2Fluajit2%2Fv2.1-agentzh&cacheSeconds=1800)](https://github.com/openresty/luajit2)
-    -   mpv [![mpv](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fmpv-player%2Fmpv&cacheSeconds=1800)](https://github.com/mpv-player/mpv)
+    -   mpv [![mpv](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2F178meorg%2Fmpv&cacheSeconds=1800)](https://github.com/178meorg/mpv)
     -   mujs [![mujs](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fcodeberg%2Fccxvii%2Fmujs&cacheSeconds=1800)](https://codeberg.org/ccxvii/mujs)
     -   nvcodec-headers [![nvcodec-headers](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FFFmpeg%2Fnv-codec-headers&cacheSeconds=1800)](https://git.videolan.org/?p=ffmpeg/nv-codec-headers.git)
     -   ogg [![ogg](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fxiph%2Fogg&cacheSeconds=1800)](https://github.com/xiph/ogg)
@@ -105,7 +105,6 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   [libopenmpt](https://lib.openmpt.org/libopenmpt/download/) (0.7.12)
     -   [libiconv](https://ftp.gnu.org/pub/gnu/libiconv/) (1.18)
     -   [vapoursynth](https://github.com/vapoursynth/vapoursynth)  ![](https://img.shields.io/github/v/release/vapoursynth/vapoursynth?style=flat-square&cacheSeconds=1800)
-
 
 
 
