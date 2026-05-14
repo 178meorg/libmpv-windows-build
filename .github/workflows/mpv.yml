@@ -97,10 +97,7 @@ jobs:
                 break;
             }
             core.setOutput("matrix_bit",JSON.stringify(matrix));
-            matrix.lgpl=[false];
-            if ("${{ inputs.lgpl}}" == "true") {
-              matrix.lgpl.push(true)
-            }
+            matrix.lgpl=["${{ inputs.lgpl}}" == "true"];
             core.setOutput("matrix",JSON.stringify(matrix));
 
             const fs = require('fs/promises');
