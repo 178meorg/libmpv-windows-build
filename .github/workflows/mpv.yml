@@ -633,21 +633,29 @@ jobs:
         env:
           tag_name: ${{ env.tag_name }}
           GH_TOKEN: ${{ github.token }}
+          default_branch: ${{ github.event.repository.default_branch }}
         shell: bash
         run: |
           git fetch --tags
-          git checkout version || git checkout -b version origin/version || ( git checkout --orphan version && git rm -rf . )
+          if git show-ref --verify --quiet refs/heads/version; then
+            git checkout version
+          elif git ls-remote --exit-code --heads origin version >/dev/null 2>&1; then
+            git checkout -b version origin/version
+          else
+            git checkout --orphan version
+            git rm -rf . >/dev/null 2>&1 || true
+          fi
           echo -e "${tag_name}" > version
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add version
-          git diff-index --quiet HEAD || ( git commit -m "${tag_name}" && git push origin version )
+          git diff --cached --quiet || ( git commit -m "${tag_name}" && git push origin version )
           if [ $(git tag -l "${tag_name}") ] ;then
             gh release delete "${tag_name}" || true
             git push --delete origin "${tag_name}" || true
             git tag -d "${tag_name}" || true
           fi
-          git checkout main
+          git checkout "${default_branch}"
 
       - name: "Generate release note & sha256"
         id: note
@@ -724,8 +732,9 @@ jobs:
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
+          default_branch: ${{ github.event.repository.default_branch }}
         run: |
-          git checkout main
+          git checkout "${default_branch}"
           bash prunetags.sh
 
   cache:
