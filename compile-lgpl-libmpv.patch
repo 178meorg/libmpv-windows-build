@@ -1,14 +1,14 @@
-From e6bf7f8db6d41538ed703e9e8767ab47c9d828c6 Mon Sep 17 00:00:00 2001
+From 544a6f89995a695bab9644084add81f06c6be3b2 Mon Sep 17 00:00:00 2001
 From: zhongfly <11155705+zhongfly@users.noreply.github.com>
-Date: Wed, 29 Oct 2025 23:03:04 +0800
+Date: Tue, 19 May 2026 11:57:54 +0800
 Subject: [PATCH] packages: compile lgpl libmpv
 
 ---
  cmake/packages_check.cmake |  6 +-----
  packages/ffmpeg.cmake      | 23 -----------------------
  packages/libarchive.cmake  |  3 +--
- packages/mpv.cmake         | 30 ++++++++----------------------
- 4 files changed, 10 insertions(+), 52 deletions(-)
+ packages/mpv.cmake         | 29 ++++++++---------------------
+ 4 files changed, 10 insertions(+), 51 deletions(-)
 
 diff --git a/cmake/packages_check.cmake b/cmake/packages_check.cmake
 index acf8ccb..f843cce 100644
@@ -120,7 +120,7 @@ index 252c687..1c666b3 100644
          ${ffmpeg_cuda}
          --enable-amf
 diff --git a/packages/libarchive.cmake b/packages/libarchive.cmake
-index 390e685..1ef119d 100644
+index ef23ed7..84ea262 100644
 --- a/packages/libarchive.cmake
 +++ b/packages/libarchive.cmake
 @@ -2,7 +2,6 @@ ExternalProject_Add(libarchive
@@ -141,7 +141,7 @@ index 390e685..1ef119d 100644
          -DENABLE_CPIO=OFF
          -DENABLE_CAT=OFF
 diff --git a/packages/mpv.cmake b/packages/mpv.cmake
-index 8624aec..2b94844 100644
+index e1c9177..aa714bd 100644
 --- a/packages/mpv.cmake
 +++ b/packages/mpv.cmake
 @@ -6,15 +6,11 @@ ExternalProject_Add(mpv
@@ -160,7 +160,7 @@ index 8624aec..2b94844 100644
          mujs
          vulkan
          shaderc
-@@ -32,23 +28,25 @@ ExternalProject_Add(mpv
+@@ -34,23 +30,25 @@ ExternalProject_Add(mpv
          --cross-file=${MESON_CROSS}
          --default-library=shared
          --prefer-static
@@ -190,7 +190,7 @@ index 8624aec..2b94844 100644
          -Dspirv-cross=enabled
          -Dvulkan=enabled
          -Dvapoursynth=enabled
-@@ -67,13 +65,6 @@ ExternalProject_Add_Step(mpv strip-binary
+@@ -71,13 +69,6 @@ ExternalProject_Add_Step(mpv strip-binary
  
  ExternalProject_Add_Step(mpv copy-binary
      DEPENDEES strip-binary
@@ -203,14 +203,14 @@ index 8624aec..2b94844 100644
 -    ${mpv_copy_debug}
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv.dll.a          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
-     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/client.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/client.h
-@@ -93,14 +84,9 @@ mv $2 $2-git-\${GIT}")
+     COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include/mpv ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv
+@@ -94,14 +85,8 @@ mv $2 $2-git-\${GIT}")
  ExternalProject_Add_Step(mpv copy-package-dir
      DEPENDEES copy-binary
      COMMAND chmod 755 ${RENAME}
 -    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-package ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
 -    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
- 
+-
 -    COMMAND mv ${CMAKE_CURRENT_BINARY_DIR}/mpv-debug ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
 -    COMMAND ${RENAME} <SOURCE_DIR> ${CMAKE_BINARY_DIR}/mpv-debug-${TARGET_CPU}${x86_64_LEVEL}-${BUILDDATE}
 -
@@ -222,5 +222,5 @@ index 8624aec..2b94844 100644
      LOG 1
  )
 -- 
-2.51.2.windows.1
+2.53.0.windows.3
 

@@ -74,7 +74,7 @@ jobs:
         with:
           script: |
             const commit = await github.rest.repos.getCommit({
-              owner: 'mpv-player',
+              owner: '178meorg',
               repo: 'mpv',
               ref: `master`
             })
@@ -314,14 +314,14 @@ jobs:
           cp mpv-patch/*.patch mpv-winbuild-cmake/packages
           ls mpv-winbuild-cmake/packages/mpv-*.patch
           cd mpv-winbuild-cmake
-          if [[ "$(ls -A ../patch_pr/0000-*.patch)" ]]; then
+          if compgen -G "../patch_pr/0000-*.patch" > /dev/null; then
             for patch in ../patch_pr/0000-*.patch ; do
               git am --3way "$patch" || git am --abort
             done
           fi
           for patch in packages/mpv-*.patch ; do
             pr="$(echo ${patch#*#} | cut -d- -f1)"
-            if [[ "$(ls -A ../patch_pr/#${pr}-*.patch)" ]]; then
+            if compgen -G "../patch_pr/#${pr}-*.patch" > /dev/null; then
               for p in ../patch_pr/#${pr}-*.patch ; do
                 git am --3way "$p" || git am --abort
               done
