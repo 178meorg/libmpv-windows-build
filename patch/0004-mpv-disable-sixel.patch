@@ -9,8 +9,8 @@ depending on libsixel and configure mpv without sixel support until the
 upstream package recipe is fixed.
 ---
  packages/mpv-release.cmake | 4 ++--
- packages/mpv.cmake         | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ packages/mpv.cmake         | 6 +++---
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/packages/mpv-release.cmake b/packages/mpv-release.cmake
 index 8f38f5a..cfb7bfe 100644
@@ -44,7 +44,8 @@ index 8624aec..6a3e8c6 100644
          subrandr
 -        libsixel
 +        # libsixel
-     GIT_REPOSITORY https://github.com/mpv-player/mpv.git
+-    GIT_REPOSITORY https://github.com/mpv-player/mpv.git
++    GIT_REPOSITORY https://github.com/178meorg/mpv.git
      SOURCE_DIR ${SOURCE_LOCATION}
      GIT_CLONE_FLAGS "--filter=tree:0"
 @@ -55,7 +55,7 @@ ExternalProject_Add(mpv

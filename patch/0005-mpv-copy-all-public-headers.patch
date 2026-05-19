@@ -1,0 +1,28 @@
+From 2a0b9f8eab8d4e6fb7f9e2c2b9a3bb034d7a72ef Mon Sep 17 00:00:00 2001
+From: codex <codex-ice@gmail.com>
+Date: Tue, 19 May 2026 12:30:00 +0800
+Subject: [PATCH] mpv: copy all public headers
+
+---
+ packages/mpv.cmake | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/packages/mpv.cmake b/packages/mpv.cmake
+index 6a3e8c6..b13a895 100644
+--- a/packages/mpv.cmake
++++ b/packages/mpv.cmake
+@@ -78,10 +78,7 @@ ExternalProject_Add_Step(mpv copy-binary
+     ${mpv_copy_debug}
+     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
+     COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv.dll.a          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
+-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/client.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/client.h
+-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/stream_cb.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/stream_cb.h
+-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render.h
+-    COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/render_gl.h    ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/render_gl.h
++    COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include/mpv ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv
+     COMMENT "Copying mpv binaries and manual"
+ )
+ 
+-- 
+2.52.0.windows.1
+

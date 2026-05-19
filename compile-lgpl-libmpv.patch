@@ -199,7 +199,7 @@ index a2954d5..a7e44de 100644
 -    ${mpv_copy_debug}
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv.dll.a          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
-     COMMAND ${CMAKE_COMMAND} -E copy <SOURCE_DIR>/include/mpv/client.h       ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv/client.h
+     COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include/mpv ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv
 @@ -99,14 +90,9 @@ mv $2 $2-git-\${GIT}")
  ExternalProject_Add_Step(mpv copy-package-dir
      DEPENDEES copy-binary
