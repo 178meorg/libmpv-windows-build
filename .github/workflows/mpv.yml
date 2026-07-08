@@ -196,6 +196,8 @@ jobs:
           echo "cache_suffix=$(date "+%Y-%m-%d")-${{ github.run_id }}-${{ github.run_attempt }}" >> $GITHUB_ENV
           sed -i '/ccache_conf.in/d'  mpv-winbuild-cmake/CMakeLists.txt
           sed -i '/ccache/d' mpv-winbuild-cmake/exec.in
+          sed -i 's#https://git.videolan.org/git/ffmpeg/nv-codec-headers.git#https://code.ffmpeg.org/FFmpeg/nv-codec-headers.git#' mpv-winbuild-cmake/packages/nvcodec-headers.cmake
+          grep -n "code.ffmpeg.org/FFmpeg/nv-codec-headers.git" mpv-winbuild-cmake/packages/nvcodec-headers.cmake
 
       - name: Lookup Toolchain Cache
         id: lookup_toolchain
