@@ -1,16 +1,18 @@
 From 3f9e0fd0c3e3a2b4b2e743f4d53d3c0d7d5c9a11 Mon Sep 17 00:00:00 2001
 From: codex <codex-ice@gmail.com>
 Date: Wed, 13 May 2026 23:55:00 +0800
-Subject: [PATCH] mpv: disable sixel support
+Subject: [PATCH] mpv: disable sixel and subrandr support
 
 libsixel is currently failing to build in CI, which blocks the default
 64-bit mpv package even though sixel is an optional output path. Stop
 depending on libsixel and configure mpv without sixel support until the
-upstream package recipe is fixed.
+upstream package recipe is fixed. The mpv source used by this build may
+not include upstream master's post-0.41.0 subrandr Meson option, so stop
+depending on subrandr and stop passing the option to Meson.
 ---
- packages/mpv-release.cmake | 4 ++--
- packages/mpv.cmake         | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ packages/mpv-release.cmake | 8 ++++----
+ packages/mpv.cmake         | 10 +++++-----
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/packages/mpv-release.cmake b/packages/mpv-release.cmake
 index 8f38f5a..cfb7bfe 100644
@@ -19,8 +21,9 @@ index 8f38f5a..cfb7bfe 100644
 @@ -38,7 +38,7 @@ ExternalProject_Add(mpv-release
          vapoursynth
          libsdl2
-         subrandr
+-        subrandr
 -        libsixel
++        # subrandr
 +        # libsixel
      URL ${LINK}
      SOURCE_DIR ${SOURCE_LOCATION}
@@ -28,8 +31,9 @@ index 8f38f5a..cfb7bfe 100644
 @@ -68,7 +68,7 @@ ExternalProject_Add(mpv-release
          -Dvulkan=enabled
          -Dvapoursynth=enabled
-         -Dsubrandr=enabled
+-        -Dsubrandr=enabled
 -        -Dsixel=enabled
++        # -Dsubrandr=enabled
 +        -Dsixel=disabled
          ${mpv_gl}
          -Dc_args='-Wno-error=int-conversion'
@@ -41,8 +45,9 @@ index 8624aec..6a3e8c6 100644
 @@ -23,7 +23,7 @@ ExternalProject_Add(mpv
          vapoursynth
          libsdl2
-         subrandr
+-        subrandr
 -        libsixel
++        # subrandr
 +        # libsixel
 -    GIT_REPOSITORY https://github.com/mpv-player/mpv.git
 +    GIT_REPOSITORY https://github.com/178meorg/mpv.git
@@ -51,8 +56,9 @@ index 8624aec..6a3e8c6 100644
 @@ -55,7 +55,7 @@ ExternalProject_Add(mpv
          -Dvulkan=enabled
          -Dvapoursynth=enabled
-         -Dsubrandr=enabled
+-        -Dsubrandr=enabled
 -        -Dsixel=enabled
++        # -Dsubrandr=enabled
 +        -Dsixel=disabled
          ${mpv_gl}
          -Dc_args='-Wno-error=int-conversion'
