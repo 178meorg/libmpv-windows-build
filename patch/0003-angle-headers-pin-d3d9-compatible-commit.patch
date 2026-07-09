@@ -8,22 +8,22 @@ EGL_PLATFORM_ANGLE_TYPE_D3D9_ANGLE. ANGLE main removed the D3D9 backend
 and no longer exports that enum, so pin the headers to the last checked
 Chromium branch commit that still provides it.
 ---
- packages/angle-headers.cmake | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ packages/angle-headers.cmake | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/packages/angle-headers.cmake b/packages/angle-headers.cmake
 index 1234567..89abcde 100644
 --- a/packages/angle-headers.cmake
 +++ b/packages/angle-headers.cmake
-@@ -3,7 +3,7 @@ ExternalProject_Add(angle-headers
+@@ -3,7 +3,8 @@ ExternalProject_Add(angle-headers
      GIT_REPOSITORY https://github.com/google/angle.git
      SOURCE_DIR ${SOURCE_LOCATION}
      GIT_REMOTE_NAME origin
 -    GIT_TAG main
-+    GIT_TAG 66fb7b57686e912d7431d1d7e257aed4d0825e35
++    GIT_TAG chromium/7936
++    GIT_RESET 66fb7b57686e912d7431d1d7e257aed4d0825e35
      GIT_CLONE_FLAGS "--sparse --filter=tree:0"
      GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone include/EGL include/KHR"
      GIT_SUBMODULES ""
 -- 
 2.53.0.windows.3
-
