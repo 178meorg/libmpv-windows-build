@@ -98,10 +98,10 @@ jobs:
           git config --global pull.rebase true
           git config --global rebase.autoStash true
           git config --global fetch.prune true
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Checkout toolchain
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: shinchiro/mpv-winbuild-cmake
           path: mpv-winbuild-cmake
@@ -177,10 +177,10 @@ jobs:
           git config --global pull.rebase true
           git config --global rebase.autoStash true
           git config --global fetch.prune true
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Checkout toolchain
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: shinchiro/mpv-winbuild-cmake
           path: mpv-winbuild-cmake
@@ -275,7 +275,7 @@ jobs:
         run: |
           sudo pacman -Syu --noconfirm
           sudo pacman -S --noconfirm --needed git curl
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       
       - name: Resave llvm cache
         id: llvm
