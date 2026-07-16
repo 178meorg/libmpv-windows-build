@@ -158,9 +158,76 @@ jobs:
           name: mpv-patch
           path: "*.patch"
 
+  validate_ffmpeg:
+    name: Validate pinned FFmpeg
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Checkout toolchain
+        uses: actions/checkout@v6
+        with:
+          repository: shinchiro/mpv-winbuild-cmake
+          path: mpv-winbuild-cmake
+          fetch-depth: 0
+
+      - name: Apply local patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          git -C mpv-winbuild-cmake config user.name "github-actions[bot]"
+          git -C mpv-winbuild-cmake config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for patch in patch/*.patch; do
+            git -C mpv-winbuild-cmake am --3way "$PWD/$patch"
+          done
+
+      - name: Apply LGPL patch
+        if: ${{ inputs.lgpl }}
+        shell: bash
+        run: git -C mpv-winbuild-cmake am --3way "$PWD/compile-lgpl-libmpv.patch"
+
+      - name: Verify FFmpeg pin and configure option
+        shell: bash
+        run: |
+          set -euo pipefail
+          ffmpeg_cmake="mpv-winbuild-cmake/packages/ffmpeg.cmake"
+          ffmpeg_repo="$(awk '$1 == "GIT_REPOSITORY" { print $2; exit }' "$ffmpeg_cmake")"
+          ffmpeg_branch="$(awk '$1 == "GIT_TAG" { print $2; exit }' "$ffmpeg_cmake")"
+          ffmpeg_commit="$(awk '$1 == "GIT_RESET" { print $2; exit }' "$ffmpeg_cmake")"
+          ffmpeg_version="$(awk '$1 == "GIT_RESET" && $3 == "#" { print $4; exit }' "$ffmpeg_cmake")"
+
+          if [[ -z "$ffmpeg_repo" || -z "$ffmpeg_branch" || -z "$ffmpeg_commit" || -z "$ffmpeg_version" ]]; then
+            echo "FFmpeg pin is incomplete in $ffmpeg_cmake" >&2
+            exit 1
+          fi
+          if [[ ! "$ffmpeg_commit" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "FFmpeg must be pinned to a full commit hash, got: $ffmpeg_commit" >&2
+            exit 1
+          fi
+
+          git ls-remote --exit-code --heads "$ffmpeg_repo" "refs/heads/$ffmpeg_branch" >/dev/null
+          tag_commit="$(git ls-remote "$ffmpeg_repo" "refs/tags/$ffmpeg_version^{}" | awk 'NR == 1 { print $1 }')"
+          if [[ "$tag_commit" != "$ffmpeg_commit" ]]; then
+            echo "$ffmpeg_version resolves to $tag_commit, expected $ffmpeg_commit" >&2
+            exit 1
+          fi
+
+          ffmpeg_source="$RUNNER_TEMP/ffmpeg-source"
+          mkdir -p "$ffmpeg_source"
+          curl --fail --location --silent --show-error --retry 3 \
+            "${ffmpeg_repo%.git}/archive/$ffmpeg_commit.tar.gz" \
+            | tar -xz -C "$ffmpeg_source" --strip-components=1
+
+          if ! "$ffmpeg_source/configure" --help | grep --fixed-strings --quiet -- '--enable-libshaderc'; then
+            echo "$ffmpeg_version does not support --enable-libshaderc" >&2
+            exit 1
+          fi
+
+          echo "Validated FFmpeg $ffmpeg_version ($ffmpeg_commit) on $ffmpeg_branch."
+
   build_mpv:
     name: Build MPV
-    needs: params
+    needs: [params, validate_ffmpeg]
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/archlinux/archlinux:base-devel
