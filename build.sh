@@ -66,8 +66,22 @@ build() {
 
     if [ "$compiler" == "gcc" ] && [ ! -f "$buildroot/build$bit/install/bin/cross-gcc" ]; then
         ninja -C $buildroot/build$bit gcc && rm -rf $buildroot/build$bit/toolchain
-    elif [ "$compiler" == "clang" ] && [ ! "$(ls -A $clang_root/bin/clang)" ]; then
-        ninja -C $buildroot/build$bit llvm && ninja -C $buildroot/build$bit llvm-clang
+    elif [ "$compiler" == "clang" ]; then
+        local target_prefix="$arch-w64-mingw32"
+        local target_sysroot="$buildroot/build$bit/install/$target_prefix"
+
+        if [ ! -x "$clang_root/bin/clang" ]; then
+            echo "Prebuilt LLVM toolchain is missing: $clang_root/bin/clang"
+            echo "Run the LLVM workflow to publish the ${LLVM_RELEASE_TAG:-llvm-toolchain} release first."
+            exit 1
+        fi
+
+        if [ ! -x "$clang_root/bin/$target_prefix-clang" ] || \
+           [ ! -f "$target_sysroot/include/windows.h" ] || \
+           [ ! -f "$target_sysroot/lib/libc++.a" ]; then
+            cmake --build $buildroot/build$bit --target llvm-download
+            ninja -C $buildroot/build$bit llvm-clang
+        fi
     fi
 
     if [[ ! "$(ls -A $buildroot/install_rustup/.cargo/bin)" ]]; then

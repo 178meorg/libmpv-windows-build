@@ -1,6 +1,10 @@
 name: MPV
 run-name: "${{ inputs.run_name != '' && format('{0} ({1})', inputs.run_name, inputs.compiler) || inputs.prs != '' && format('{0}[{2}] ({1})', github.workflow, inputs.compiler, inputs.prs) || format('{0} ({1})', github.workflow, inputs.compiler) }}"
 
+env:
+  LLVM_RELEASE_TAG: llvm-toolchain
+  LLVM_RELEASE_ASSET: llvm-linux-x86_64.tar.zst
+
 permissions:
   actions: write
   attestations: write
@@ -242,7 +246,7 @@ jobs:
           sudo pacman-key --init
           sudo pacman-key --populate archlinux
           sudo pacman -Syu --noconfirm
-          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld libc++ unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache python-pip 7zip
+          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld libc++ unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache python-pip 7zip zstd
           sudo python -m pip install --break-system-packages roman
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -321,12 +325,39 @@ jobs:
 
       - name: Restore clang sysroot cache
         if: ${{ inputs.compiler =='clang' }}
+        id: restore_clang_root
         uses: actions/cache/restore@v5.0.5
         with: 
           path: ${{ github.workspace }}/mpv-winbuild-cmake/clang_root
           key: ${{ matrix.bit }}-clang_root-${{ env.key_suffix }}
           restore-keys: |
             ${{ matrix.bit }}-clang_root-${{ env.restore_suffix }}
+
+      - name: Download LLVM toolchain release
+        if: ${{ inputs.compiler == 'clang' && steps.restore_clang_root.outputs.cache-matched-key == '' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          download_dir="$RUNNER_TEMP/llvm-toolchain"
+          release_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${LLVM_RELEASE_TAG}"
+          mkdir -p "$download_dir"
+
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --output "$download_dir/$LLVM_RELEASE_ASSET" \
+            "$release_url/$LLVM_RELEASE_ASSET"
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --output "$download_dir/$LLVM_RELEASE_ASSET.sha256" \
+            "$release_url/$LLVM_RELEASE_ASSET.sha256"
+
+          cd "$download_dir"
+          sha256sum --check "$LLVM_RELEASE_ASSET.sha256"
+          rm -rf "$GITHUB_WORKSPACE/mpv-winbuild-cmake/clang_root"
+          tar --zstd -xf "$LLVM_RELEASE_ASSET" -C "$GITHUB_WORKSPACE/mpv-winbuild-cmake"
+          "$GITHUB_WORKSPACE/mpv-winbuild-cmake/clang_root/bin/clang" --version | head -n 1
 
       - name: Restore Rust Cache
         uses: actions/cache/restore@v5.0.5

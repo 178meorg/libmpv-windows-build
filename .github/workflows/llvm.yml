@@ -1,6 +1,10 @@
 name: LLVM
 run-name: "${{ inputs.run_name != '' && inputs.run_name || github.workflow }}"
 
+env:
+  LLVM_RELEASE_TAG: llvm-toolchain
+  LLVM_RELEASE_ASSET: llvm-linux-x86_64.tar.zst
+
 on: 
   workflow_dispatch:
     inputs:
@@ -13,6 +17,11 @@ on:
         description: "Don't save caches after success build"
         required: false
         default: false
+        type: boolean
+      publish_toolchain:
+        description: "Publish LLVM toolchain to GitHub Release"
+        required: false
+        default: true
         type: boolean
       trigger_toolchain:
         description: "Trigger toolchain build action after success build"
@@ -46,6 +55,8 @@ jobs:
   build_llvm:
     name: Build LLVM
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     container:
       image: ghcr.io/archlinux/archlinux:base-devel
     steps:
@@ -59,7 +70,7 @@ jobs:
           sudo pacman-key --init
           sudo pacman-key --populate archlinux
           sudo pacman -Syu --noconfirm
-          sudo pacman -S --noconfirm --needed git ninja cmake meson wget mimalloc go 7zip unzip
+          sudo pacman -S --noconfirm --needed git ninja cmake meson wget mimalloc go 7zip unzip zstd
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global pull.rebase true
@@ -110,6 +121,46 @@ jobs:
           compiler: "clang"
           command: "ninja -C $buildroot/build$bit llvm && rm -rf clang_root/llvm-thinlto || true"
           extra_option: "-DLLVM_ENABLE_PGO=USE -DLLVM_ENABLE_LTO=Thin -DLLVM_PROFDATA_FILE=$buildroot/llvm.profdata"
+
+      - name: Package LLVM toolchain
+        if: ${{ inputs.publish_toolchain }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -x mpv-winbuild-cmake/clang_root/bin/clang
+
+          tar --use-compress-program='zstd -T0 -3' \
+            --exclude='clang_root/llvm-thinlto' \
+            --exclude='clang_root/llvm-ccache' \
+            -cf "$LLVM_RELEASE_ASSET" \
+            -C mpv-winbuild-cmake clang_root
+          sha256sum "$LLVM_RELEASE_ASSET" > "$LLVM_RELEASE_ASSET.sha256"
+
+          llvm_commit="$(git -C mpv-winbuild-cmake/src_packages/llvm rev-parse HEAD)"
+          clang_version="$(mpv-winbuild-cmake/clang_root/bin/clang --version | head -n 1)"
+          {
+            echo "LLVM commit: $llvm_commit"
+            echo "Compiler: $clang_version"
+            echo "PGO: ${{ inputs.pgo }}"
+            echo "Workflow: https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo
+            sha256sum "$LLVM_RELEASE_ASSET"
+          } > llvm-toolchain-info.txt
+
+      - name: Publish LLVM toolchain release
+        if: ${{ inputs.publish_toolchain }}
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "${{ env.LLVM_RELEASE_ASSET }},${{ env.LLVM_RELEASE_ASSET }}.sha256"
+          artifactErrorsFailBuild: true
+          allowUpdates: true
+          replacesArtifacts: true
+          bodyFile: llvm-toolchain-info.txt
+          commit: ${{ github.sha }}
+          tag: ${{ env.LLVM_RELEASE_TAG }}
+          name: LLVM toolchain
+          prerelease: true
+          makeLatest: false
 
       - name: Save llvm cache
         uses: actions/cache/save@v5.0.5

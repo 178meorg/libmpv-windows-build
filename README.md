@@ -14,6 +14,12 @@ Checks the mpv repository every hour for updates. If there is an update and it i
 
 This repo only provides 64-bit version. If you need a 32-bit version, you can fork this repo and run `MPV` workflow by yourself.
 
+### LLVM Toolchain
+
+Run the `LLVM` workflow once with `Publish LLVM toolchain to GitHub Release` enabled. The workflow packages `clang_root`, publishes it to the `llvm-toolchain` prerelease, and uploads a SHA256 checksum.
+
+Later `toolchain` and `MPV` runs prefer the GitHub Actions cache. If the cache is unavailable, they download and verify the toolchain from that release instead of rebuilding LLVM.
+
 > [!NOTE]
 > `mpv-dev-xxxx.7z` is libmpv, including the `libmpv-2.dll` file.
 >
@@ -105,6 +111,5 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   [libopenmpt](https://lib.openmpt.org/libopenmpt/download/) (0.7.12)
     -   [libiconv](https://ftp.gnu.org/pub/gnu/libiconv/) (1.18)
     -   [vapoursynth](https://github.com/vapoursynth/vapoursynth)  ![](https://img.shields.io/github/v/release/vapoursynth/vapoursynth?style=flat-square&cacheSeconds=1800)
-
 
 
