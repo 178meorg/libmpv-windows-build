@@ -163,7 +163,7 @@ jobs:
           makeLatest: false
 
       - name: Save llvm cache
-        uses: actions/cache/save@v5.0.5
+        uses: actions/cache/save@v6.1.0
         if: ${{ !inputs.no_save_cache }}
         with: 
           path: |
