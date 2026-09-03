@@ -1,4 +1,4 @@
-From 544a6f89995a695bab9644084add81f06c6be3b2 Mon Sep 17 00:00:00 2001
+From 94eb8137e47fd495317dedacf1af43e4d9436e82 Mon Sep 17 00:00:00 2001
 From: zhongfly <11155705+zhongfly@users.noreply.github.com>
 Date: Tue, 19 May 2026 11:57:54 +0800
 Subject: [PATCH] packages: compile lgpl libmpv
@@ -116,7 +116,7 @@ index 120fc2b..248b279 100644
          --enable-cuda-llvm
          --enable-cuvid
 diff --git a/packages/libarchive.cmake b/packages/libarchive.cmake
-index 39f0396..7902fab 100644
+index 03d799d..f5f85c1 100644
 --- a/packages/libarchive.cmake
 +++ b/packages/libarchive.cmake
 @@ -1,7 +1,6 @@
@@ -127,7 +127,7 @@ index 39f0396..7902fab 100644
          xz
          zlib
          zstd
-@@ -26,7 +25,7 @@ ExternalProject_Add(libarchive
+@@ -29,7 +28,7 @@ ExternalProject_Add(libarchive
          -DENABLE_ICONV=ON
          -DENABLE_LIBXML2=ON
          -DENABLE_EXPAT=OFF

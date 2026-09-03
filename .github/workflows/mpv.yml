@@ -4,6 +4,7 @@ run-name: "${{ inputs.run_name != '' && format('{0} ({1})', inputs.run_name, inp
 env:
   LLVM_RELEASE_TAG: llvm-toolchain
   LLVM_RELEASE_ASSET: llvm-linux-x86_64.tar.zst
+  MPV_WINBUILD_REF: cd1edc11dc6887a50f705717619d879f5a93a488
 
 permissions:
   actions: write
@@ -172,6 +173,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: shinchiro/mpv-winbuild-cmake
+          ref: ${{ env.MPV_WINBUILD_REF }}
           path: mpv-winbuild-cmake
           fetch-depth: 0
 
@@ -257,6 +259,29 @@ jobs:
 
           echo "Validated uchardet $uchardet_version ($uchardet_commit) on $uchardet_branch."
 
+      - name: Verify libarchive pin
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          libarchive_cmake="mpv-winbuild-cmake/packages/libarchive.cmake"
+          libarchive_repo="$(awk '$1 == "GIT_REPOSITORY" { print $2; exit }' "$libarchive_cmake")"
+          libarchive_branch="$(awk '$1 == "GIT_TAG" { print $2; exit }' "$libarchive_cmake")"
+          libarchive_commit="$(awk '$1 == "GIT_RESET" { print $2; exit }' "$libarchive_cmake")"
+          libarchive_version="$(awk '$1 == "GIT_RESET" && $3 == "#" { print $4; exit }' "$libarchive_cmake")"
+          if [[ ! "$libarchive_commit" =~ ^[0-9a-f]{40}$ || "$libarchive_version" != "v3.8.9" ]]; then
+            echo "libarchive pin is invalid in $libarchive_cmake" >&2
+            exit 1
+          fi
+          git ls-remote --exit-code --heads "$libarchive_repo" "refs/heads/$libarchive_branch" >/dev/null
+          libarchive_tag_commit="$(git ls-remote "$libarchive_repo" "refs/tags/$libarchive_version^{}" | awk 'NR == 1 { print $1}')"
+          if [[ "$libarchive_tag_commit" != "$libarchive_commit" ]]; then
+            echo "$libarchive_version resolves to $libarchive_tag_commit, expected $libarchive_commit" >&2
+            exit 1
+          fi
+
+          echo "Validated libarchive $libarchive_version ($libarchive_commit)."
+
   build_mpv:
     name: Build MPV
     needs: [params, validate_ffmpeg]
@@ -286,6 +311,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: shinchiro/mpv-winbuild-cmake
+          ref: ${{ env.MPV_WINBUILD_REF }}
           path: mpv-winbuild-cmake
           fetch-depth: 0
       - name: Prepare

@@ -35,7 +35,7 @@ Later `toolchain` and `MPV` runs prefer the GitHub Actions cache. If the cache i
 
 ## Information about packages
 
-same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/README.md#information-about-packages) [![](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fshinchiro%2Fmpv-winbuild-cmake&cacheSeconds=1800)](https://github.com/shinchiro/mpv-winbuild-cmake)
+Based on [shinchiro/mpv-winbuild-cmake at cd1edc11dc](https://github.com/shinchiro/mpv-winbuild-cmake/tree/cd1edc11dc6887a50f705717619d879f5a93a488).
 
 -   Git/Hg
     -   amf-headers [![amf-headers](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FGPUOpen-LibrariesAndSDKs%2FAMF&cacheSeconds=1800)](https://github.com/GPUOpen-LibrariesAndSDKs/AMF/tree/master/amf/public/include)
@@ -46,14 +46,14 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   dav1d [![dav1d](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fcode.videolan.org%2Fvideolan%2Fdav1d&cacheSeconds=1800)](https://code.videolan.org/videolan/dav1d/)
     -   davs2 [![davs2](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fpkuvcl%2Fdavs2&cacheSeconds=1800)](https://github.com/pkuvcl/davs2)
     -   expat [![expat](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Flibexpat%2Flibexpat&cacheSeconds=1800)](https://github.com/libexpat/libexpat)
-    -   FFmpeg [![FFmpeg](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FFFmpeg%2FFFmpeg&cacheSeconds=1800)](https://github.com/FFmpeg/FFmpeg)
+    -   FFmpeg ([n8.1.2](https://github.com/FFmpeg/FFmpeg/releases/tag/n8.1.2), latest mpv 0.41-compatible stable release)
     -   fontconfig [![fontconfig](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fgitlab.freedesktop.org%2Ffontconfig%2Ffontconfig&cacheSeconds=1800)](https://gitlab.freedesktop.org/fontconfig/fontconfig)
     -   freetype2 [![freetype2](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Ffreetype%2Ffreetype&cacheSeconds=1800)](https://github.com/freetype/freetype)
     -   fribidi [![fribidi](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Ffribidi%2Ffribidi&cacheSeconds=1800)](https://github.com/fribidi/fribidi)
     -   harfbuzz [![harfbuzz](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fharfbuzz%2Fharfbuzz%2Fmain&cacheSeconds=1800)](https://github.com/harfbuzz/harfbuzz)
     -   lame [![lame](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fgitlab.com%2Fshinchiro%2F%2Flame&cacheSeconds=1800)](https://gitlab.com/shinchiro/lame)
     -   lcms2 [![lcms2](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fmm2%2FLittle-CMS&cacheSeconds=1800)](https://github.com/mm2/Little-CMS)
-    -   libarchive [![libarchive](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Flibarchive%2Flibarchive&cacheSeconds=1800)](https://github.com/libarchive/libarchive)
+    -   libarchive ([v3.8.9](https://github.com/libarchive/libarchive/releases/tag/v3.8.9))
     -   libaribcaption [![libaribcaption](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fxqq%2Flibaribcaption&cacheSeconds=1800)](https://github.com/xqq/libaribcaption)
     -   libass [![libass](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Flibass%2Flibass&cacheSeconds=1800)](https://github.com/libass/libass)
     -   libbluray [![libbluray](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fcode.videolan.org%2Fvideolan%2Flibbluray&cacheSeconds=1800)](https://code.videolan.org/videolan/libbluray)
@@ -81,7 +81,7 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   libzimg (with [graphengine](https://github.com/sekrit-twc/graphengine)) [![libzimg](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fsekrit-twc%2Fzimg&cacheSeconds=1800)](https://github.com/sekrit-twc/zimg)
     -   libzvbi [![libzvbi](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fzapping-vbi%2Fzvbi%2Fmain&cacheSeconds=1800)](https://github.com/zapping-vbi/zvbi)
     -   luajit [![luajit](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fopenresty%2Fluajit2%2Fv2.1-agentzh&cacheSeconds=1800)](https://github.com/openresty/luajit2)
-    -   mpv [![mpv](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2F178meorg%2Fmpv&cacheSeconds=1800)](https://github.com/178meorg/mpv)
+    -   mpv ([178meorg/mpv master](https://github.com/178meorg/mpv/tree/master))
     -   mujs [![mujs](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fcodeberg%2Fccxvii%2Fmujs&cacheSeconds=1800)](https://codeberg.org/ccxvii/mujs)
     -   nvcodec-headers [![nvcodec-headers](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FFFmpeg%2Fnv-codec-headers&cacheSeconds=1800)](https://git.videolan.org/?p=ffmpeg/nv-codec-headers.git)
     -   ogg [![ogg](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fxiph%2Fogg&cacheSeconds=1800)](https://github.com/xiph/ogg)
@@ -111,4 +111,3 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   [libopenmpt](https://lib.openmpt.org/libopenmpt/download/) (0.7.12)
     -   [libiconv](https://ftp.gnu.org/pub/gnu/libiconv/) (1.18)
     -   [vapoursynth](https://github.com/vapoursynth/vapoursynth)  ![](https://img.shields.io/github/v/release/vapoursynth/vapoursynth?style=flat-square&cacheSeconds=1800)
-

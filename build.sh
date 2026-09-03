@@ -52,6 +52,42 @@ package() {
     sudo chmod -R a+rwx $buildroot/build$bit
 }
 
+reset_pinned_package() {
+    local package_name=$1
+    local package_cmake=$2
+    local package_source=$3
+    local package_build=$4
+    local always_clean=${5:-false}
+    local expected_commit
+    local current_commit
+
+    expected_commit=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$package_cmake")
+    if [[ ! "$expected_commit" =~ ^[0-9a-f]{40}$ ]]; then
+        echo "$package_name pin is invalid: $expected_commit" >&2
+        exit 1
+    fi
+
+    if ! git -C "$package_source" cat-file -e "$expected_commit^{commit}"; then
+        git -C "$package_source" fetch origin "$expected_commit"
+    fi
+
+    current_commit=$(git -C "$package_source" rev-parse HEAD 2>/dev/null || true)
+    if [[ "$always_clean" == "true" || "$current_commit" != "$expected_commit" ]]; then
+        if ! ninja -C "$package_build" "${package_name}-fullclean"; then
+            echo "Failed to clean pinned $package_name build state" >&2
+            exit 1
+        fi
+    fi
+
+    git -C "$package_source" reset --hard "$expected_commit"
+
+    current_commit=$(git -C "$package_source" rev-parse HEAD)
+    if [[ "$current_commit" != "$expected_commit" ]]; then
+        echo "$package_name source is not pinned: expected $expected_commit, got $current_commit" >&2
+        exit 1
+    fi
+}
+
 build() {
     local bit=$1
     local arch=$2
@@ -90,28 +126,11 @@ build() {
     fi
     ninja -C $buildroot/build$bit update
 
-    local uchardet_cmake="$gitdir/packages/uchardet.cmake"
-    local uchardet_expected
-    uchardet_expected=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$uchardet_cmake")
-    if [[ ! "$uchardet_expected" =~ ^[0-9a-f]{40}$ ]]; then
-        echo "uchardet pin is invalid: $uchardet_expected" >&2
-        exit 1
-    fi
-
-    ninja -C $buildroot/build$bit uchardet-fullclean
-    if ! git -C "$srcdir/uchardet" cat-file -e "$uchardet_expected^{commit}"; then
-        git -C "$srcdir/uchardet" fetch origin "$uchardet_expected"
-    fi
-    git -C "$srcdir/uchardet" reset --hard "$uchardet_expected"
-
-    local uchardet_actual
-    uchardet_actual=$(git -C "$srcdir/uchardet" rev-parse HEAD)
-    if [[ "$uchardet_actual" != "$uchardet_expected" ]]; then
-        echo "uchardet source is not pinned: expected $uchardet_expected, got $uchardet_actual" >&2
-        exit 1
-    fi
-
-    ninja -C $buildroot/build$bit mpv-fullclean
+    local package_build="$buildroot/build$bit"
+    reset_pinned_package ffmpeg "$gitdir/packages/ffmpeg.cmake" "$srcdir/ffmpeg" "$package_build"
+    reset_pinned_package libarchive "$gitdir/packages/libarchive.cmake" "$srcdir/libarchive" "$package_build" true
+    reset_pinned_package uchardet "$gitdir/packages/uchardet.cmake" "$srcdir/uchardet" "$package_build" true
+    ninja -C "$package_build" mpv-fullclean
     
     ninja -C $buildroot/build$bit mpv
 

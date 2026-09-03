@@ -1,0 +1,24 @@
+From 0aadb515ae70b51cd16bd9855372122c252d21c5 Mon Sep 17 00:00:00 2001
+From: codex <codex-ice@gmail.com>
+Date: Thu, 3 Sep 2026 10:46:24 +0800
+Subject: [PATCH] libarchive: pin to stable 3.8.9
+
+Pin libarchive to the latest stable release so upstream development changes cannot alter or break reproducible libmpv builds.
+---
+ packages/libarchive.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/packages/libarchive.cmake b/packages/libarchive.cmake
+index 39f0396..03d799d 100644
+--- a/packages/libarchive.cmake
++++ b/packages/libarchive.cmake
+@@ -9,6 +9,9 @@ ExternalProject_Add(libarchive
+         libxml2
+     GIT_REPOSITORY https://github.com/libarchive/libarchive.git
+     SOURCE_DIR ${SOURCE_LOCATION}
++    GIT_REMOTE_NAME origin
++    GIT_TAG master
++    GIT_RESET 27cbc7827172698143e440801fc0ba39ccb4f1f5 # v3.8.9
+     GIT_CLONE_FLAGS "--filter=tree:0"
+     UPDATE_COMMAND ""
+     CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
