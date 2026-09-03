@@ -175,15 +175,20 @@ jobs:
           path: mpv-winbuild-cmake
           fetch-depth: 0
 
-      - name: Apply dependency pin patches
+      - name: Apply local patches
         shell: bash
         run: |
           set -euo pipefail
           git -C mpv-winbuild-cmake config user.name "github-actions[bot]"
           git -C mpv-winbuild-cmake config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for patch in patch/0006-ffmpeg-pin-stable-version.patch patch/0007-uchardet-pin-v0.0.8.patch; do
+          for patch in patch/*.patch; do
             git -C mpv-winbuild-cmake am --3way "$PWD/$patch"
           done
+
+      - name: Apply LGPL patch
+        if: ${{ inputs.lgpl }}
+        shell: bash
+        run: git -C mpv-winbuild-cmake am --3way "$PWD/compile-lgpl-libmpv.patch"
 
       - name: Verify FFmpeg pin and configure option
         shell: bash
@@ -453,10 +458,11 @@ jobs:
           done
       - name: Apply local patches
         run: |
+          set -euo pipefail
           cd mpv-winbuild-cmake
           if [[ "$(ls -A ../patch/*.patch)" ]]; then
             for patch in ../patch/*.patch ; do
-              git am --3way "$patch" || git am --abort
+              git am --3way "$patch"
             done
           fi
 
