@@ -89,6 +89,28 @@ build() {
         ninja -C $buildroot/build$bit rustup
     fi
     ninja -C $buildroot/build$bit update
+
+    local uchardet_cmake="$gitdir/packages/uchardet.cmake"
+    local uchardet_expected
+    uchardet_expected=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$uchardet_cmake")
+    if [[ ! "$uchardet_expected" =~ ^[0-9a-f]{40}$ ]]; then
+        echo "uchardet pin is invalid: $uchardet_expected" >&2
+        exit 1
+    fi
+
+    ninja -C $buildroot/build$bit uchardet-fullclean
+    if ! git -C "$srcdir/uchardet" cat-file -e "$uchardet_expected^{commit}"; then
+        git -C "$srcdir/uchardet" fetch origin "$uchardet_expected"
+    fi
+    git -C "$srcdir/uchardet" reset --hard "$uchardet_expected"
+
+    local uchardet_actual
+    uchardet_actual=$(git -C "$srcdir/uchardet" rev-parse HEAD)
+    if [[ "$uchardet_actual" != "$uchardet_expected" ]]; then
+        echo "uchardet source is not pinned: expected $uchardet_expected, got $uchardet_actual" >&2
+        exit 1
+    fi
+
     ninja -C $buildroot/build$bit mpv-fullclean
     
     ninja -C $buildroot/build$bit mpv

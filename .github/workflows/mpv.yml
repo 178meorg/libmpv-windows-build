@@ -163,7 +163,7 @@ jobs:
           path: "*.patch"
 
   validate_ffmpeg:
-    name: Validate pinned FFmpeg
+    name: Validate pinned dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -175,20 +175,15 @@ jobs:
           path: mpv-winbuild-cmake
           fetch-depth: 0
 
-      - name: Apply local patches
+      - name: Apply dependency pin patches
         shell: bash
         run: |
           set -euo pipefail
           git -C mpv-winbuild-cmake config user.name "github-actions[bot]"
           git -C mpv-winbuild-cmake config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for patch in patch/*.patch; do
+          for patch in patch/0006-ffmpeg-pin-stable-version.patch patch/0007-uchardet-pin-v0.0.8.patch; do
             git -C mpv-winbuild-cmake am --3way "$PWD/$patch"
           done
-
-      - name: Apply LGPL patch
-        if: ${{ inputs.lgpl }}
-        shell: bash
-        run: git -C mpv-winbuild-cmake am --3way "$PWD/compile-lgpl-libmpv.patch"
 
       - name: Verify FFmpeg pin and configure option
         shell: bash
@@ -228,6 +223,34 @@ jobs:
           fi
 
           echo "Validated FFmpeg $ffmpeg_version ($ffmpeg_commit) on $ffmpeg_branch."
+
+      - name: Verify uchardet pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          uchardet_cmake="mpv-winbuild-cmake/packages/uchardet.cmake"
+          uchardet_repo="$(awk '$1 == "GIT_REPOSITORY" { print $2; exit }' "$uchardet_cmake")"
+          uchardet_branch="$(awk '$1 == "GIT_TAG" { print $2; exit }' "$uchardet_cmake")"
+          uchardet_commit="$(awk '$1 == "GIT_RESET" { print $2; exit }' "$uchardet_cmake")"
+          uchardet_version="$(awk '$1 == "GIT_RESET" && $3 == "#" { print $4; exit }' "$uchardet_cmake")"
+
+          if [[ -z "$uchardet_repo" || -z "$uchardet_branch" || -z "$uchardet_commit" || -z "$uchardet_version" ]]; then
+            echo "uchardet pin is incomplete in $uchardet_cmake" >&2
+            exit 1
+          fi
+          if [[ ! "$uchardet_commit" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "uchardet must be pinned to a full commit hash, got: $uchardet_commit" >&2
+            exit 1
+          fi
+
+          git ls-remote --exit-code --heads "$uchardet_repo" "refs/heads/$uchardet_branch" >/dev/null
+          tag_commit="$(git ls-remote "$uchardet_repo" "refs/tags/$uchardet_version^{}" | awk 'NR == 1 { print $1}')"
+          if [[ "$tag_commit" != "$uchardet_commit" ]]; then
+            echo "$uchardet_version resolves to $tag_commit, expected $uchardet_commit" >&2
+            exit 1
+          fi
+
+          echo "Validated uchardet $uchardet_version ($uchardet_commit) on $uchardet_branch."
 
   build_mpv:
     name: Build MPV

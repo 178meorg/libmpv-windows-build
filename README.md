@@ -95,7 +95,7 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   subrandr [![subrandr](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fafishhh%2Fsubrandr%2Fmaster&cacheSeconds=1800)](https://github.com/afishhh/subrandr)
     -   svtav1 [![svtav1](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fgitlab.com%2FAOMediaCodec%2FSVT-AV1&cacheSeconds=1800)](https://gitlab.com/AOMediaCodec/SVT-AV1)
     -   uavs3d [![uavs3d](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fuavs3%2Fuavs3d&cacheSeconds=1800)](https://github.com/uavs3/uavs3d)
-    -   uchardet [![uchardet](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fgitlab.freedesktop.org%2Fuchardet%2Fuchardet&cacheSeconds=1800)](https://gitlab.freedesktop.org/uchardet/uchardet)
+    -   uchardet ([v0.0.8](https://gitlab.freedesktop.org/uchardet/uchardet/-/releases/v0.0.8))
     -   vorbis [![vorbis](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fxiph%2Fvorbis&cacheSeconds=1800)](https://github.com/xiph/vorbis) 
     -   vulkan [![Vulkan](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FKhronosGroup%2FVulkan-Loader%2Fmain&cacheSeconds=1800)](https://github.com/KhronosGroup/Vulkan-Loader) 
     -   vulkan-header [![Vulkan-Headers](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FKhronosGroup%2FVulkan-Headers%2Fmain&cacheSeconds=1800)](https://github.com/KhronosGroup/Vulkan-Headers)
@@ -111,5 +111,4 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   [libopenmpt](https://lib.openmpt.org/libopenmpt/download/) (0.7.12)
     -   [libiconv](https://ftp.gnu.org/pub/gnu/libiconv/) (1.18)
     -   [vapoursynth](https://github.com/vapoursynth/vapoursynth)  ![](https://img.shields.io/github/v/release/vapoursynth/vapoursynth?style=flat-square&cacheSeconds=1800)
-
 
