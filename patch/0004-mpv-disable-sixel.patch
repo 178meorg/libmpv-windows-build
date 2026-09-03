@@ -67,7 +67,6 @@ index a2954d5..818e9be 100644
 +        # -Dsubrandr=enabled
 +        -Dsixel=disabled
          ${mpv_gl}
-         -Dlibcurl=enabled
          -Dc_args='-Wno-error=int-conversion'
 -- 
 2.52.0
