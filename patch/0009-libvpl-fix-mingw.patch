@@ -1,0 +1,49 @@
+From 14afdca37f07aae41b02df00079043c407911073 Mon Sep 17 00:00:00 2001
+From: codex <codex-ice@gmail.com>
+Date: Thu, 3 Sep 2026 12:21:47 +0800
+Subject: [PATCH] libvpl: fix MinGW wcscpy_s compatibility
+
+---
+ ...0001-avoid-brittle-wcscpy-s-on-mingw.patch | 20 +++++++++++++++++++
+ packages/libvpl.cmake                         |  1 +
+ 2 files changed, 21 insertions(+)
+ create mode 100644 packages/libvpl-0001-avoid-brittle-wcscpy-s-on-mingw.patch
+
+diff --git a/packages/libvpl-0001-avoid-brittle-wcscpy-s-on-mingw.patch b/packages/libvpl-0001-avoid-brittle-wcscpy-s-on-mingw.patch
+new file mode 100644
+index 0000000..d8c2f92
+--- /dev/null
++++ b/packages/libvpl-0001-avoid-brittle-wcscpy-s-on-mingw.patch
+@@ -0,0 +1,20 @@
++From 9cb2dc5643480bde33909e11b0ec1ddeb6339f45 Mon Sep 17 00:00:00 2001
++From: Martin Storsjo <martin@martin.st>
++Date: Tue, 1 Sep 2026 10:33:56 +0300
++Subject: [PATCH] Avoid brittle wcscpy_s and wcscat_s defines on mingw
++
++Limit the legacy MSVC fallback macros to MSVC targets. MinGW provides these
++functions through its Windows headers, and redefining them breaks stralign.h.
++---
++ libvpl/src/windows/mfx_dispatcher_defs.h | 2 +-
++ 1 file changed, 1 insertion(+), 1 deletion(-)
++
++diff --git a/libvpl/src/windows/mfx_dispatcher_defs.h b/libvpl/src/windows/mfx_dispatcher_defs.h
++index 38fd221..a23f1ce 100644
++--- a/libvpl/src/windows/mfx_dispatcher_defs.h
+++++ b/libvpl/src/windows/mfx_dispatcher_defs.h
++@@ -20,3 +20,3 @@
++-#if _MSC_VER < 1400
+++#if defined(_MSC_VER) && _MSC_VER < 1400
++     #define wcscpy_s(to, to_size, from) \
++         (void)(to_size);                \
+diff --git a/packages/libvpl.cmake b/packages/libvpl.cmake
+index d934857..cbe15e9 100644
+--- a/packages/libvpl.cmake
++++ b/packages/libvpl.cmake
+@@ -5,6 +5,7 @@ ExternalProject_Add(libvpl
+     GIT_REMOTE_NAME origin
+     GIT_TAG main
+     UPDATE_COMMAND ""
++    PATCH_COMMAND ${EXEC} git am --3way ${CMAKE_CURRENT_SOURCE_DIR}/libvpl-*.patch
+     CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>
+         -G Ninja
+         -DCMAKE_BUILD_TYPE=Release
