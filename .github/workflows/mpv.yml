@@ -173,7 +173,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: shinchiro/mpv-winbuild-cmake
-          ref: ${{ env.MPV_WINBUILD_REF }}
+          ref: 5efd298cb51513c2410e4e9029b5e56b83c2aaac
           path: mpv-winbuild-cmake
           fetch-depth: 0
 
@@ -311,7 +311,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           repository: shinchiro/mpv-winbuild-cmake
-          ref: ${{ env.MPV_WINBUILD_REF }}
+          ref: 5efd298cb51513c2410e4e9029b5e56b83c2aaac
           path: mpv-winbuild-cmake
           fetch-depth: 0
       - name: Prepare
