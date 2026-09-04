@@ -392,6 +392,17 @@ jobs:
           key: rust-${{ env.key_suffix }}
           restore-keys: |
             rust-${{ env.restore_suffix }}
+
+      - name: Install Rust (if not cached)
+        if: ${{ steps.cache_rust.outputs.cache-hit != 'true' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "${{ github.workspace }}/mpv-winbuild-cmake/install_rustup"
+          cd "${{ github.workspace }}/mpv-winbuild-cmake/install_rustup"
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | \
+          sh -s -- -y --no-modify-path --installation-option="--prefix=${{ github.workspace }}/mpv-winbuild-cmake/install_rustup"
+
       - name: Restore Source Cache
         uses: actions/cache/restore@v5.0.5
         with:
