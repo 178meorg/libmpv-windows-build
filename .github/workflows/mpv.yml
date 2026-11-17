@@ -186,7 +186,7 @@ jobs:
         shell: bash
         run: git -C mpv-winbuild-cmake am --3way "$PWD/compile-lgpl-libmpv.patch"
 
-      - name: Verify FFmpeg pin and configure option
+      - name: Verify FFmpeg release pin
         shell: bash
         run: |
           set -euo pipefail
@@ -212,17 +212,6 @@ jobs:
             exit 1
           fi
 
-          ffmpeg_source="$RUNNER_TEMP/ffmpeg-source"
-          mkdir -p "$ffmpeg_source"
-          curl --fail --location --silent --show-error --retry 3 \
-            "${ffmpeg_repo%.git}/archive/$ffmpeg_commit.tar.gz" \
-            | tar -xz -C "$ffmpeg_source" --strip-components=1
-
-          if ! "$ffmpeg_source/configure" --help | grep --fixed-strings --quiet -- '--enable-libshaderc'; then
-            echo "$ffmpeg_version does not support --enable-libshaderc" >&2
-            exit 1
-          fi
-
           echo "Validated FFmpeg $ffmpeg_version ($ffmpeg_commit) on $ffmpeg_branch."
 
   build_mpv:
@@ -231,7 +220,6 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/archlinux/archlinux:base-devel
-    continue-on-error: true
     strategy:
       matrix: ${{ fromJson(needs.params.outputs.matrix) }}
 

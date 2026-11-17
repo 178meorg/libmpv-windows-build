@@ -75,6 +75,19 @@ build() {
         ninja -C $buildroot/build$bit rustup
     fi
     ninja -C $buildroot/build$bit update
+
+    # Pinned sources can change while restored build stamps still refer to the
+    # previous FFmpeg. Invalidate those stamps before reusing installed libraries.
+    local ffmpeg_commit ffmpeg_built_commit
+    ffmpeg_commit=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$gitdir/packages/ffmpeg.cmake")
+    if [[ ! "$ffmpeg_commit" =~ ^[0-9a-f]{40}$ ]]; then
+        echo "Invalid FFmpeg commit pin: $ffmpeg_commit" >&2
+        exit 1
+    fi
+    ffmpeg_built_commit=$(cat "$buildroot/build$bit/packages/ffmpeg-prefix/src/ffmpeg-stamp/HEAD" 2>/dev/null || true)
+    if [[ "$ffmpeg_built_commit" != "$ffmpeg_commit" ]]; then
+        ninja -C "$buildroot/build$bit" ffmpeg-fullclean || exit 1
+    fi
     ninja -C $buildroot/build$bit mpv-fullclean
     
     ninja -C $buildroot/build$bit mpv

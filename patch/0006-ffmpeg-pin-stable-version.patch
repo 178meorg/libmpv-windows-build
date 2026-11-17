@@ -1,12 +1,11 @@
-From 38b88335f99e76ed89ff3c93f877fdefce736c13 Mon Sep 17 00:00:00 2001
+From 946fcce07b6dcd0331c8cc609192aeff5e1924f8 Mon Sep 17 00:00:00 2001
 From: codex <codex-ice@gmail.com>
 Date: Thu, 16 Jul 2026 14:30:00 +0800
-Subject: [PATCH] ffmpeg: pin to stable 8.1.2
+Subject: [PATCH] ffmpeg: pin to stable 9.0.2
 
-FFmpeg master removed the libshaderc configure option while the build
-still enables it. Pin FFmpeg to the 8.1.2 release commit, where the
-option remains available, so upstream development changes cannot break
-the CI build unexpectedly.
+Pin the latest FFmpeg 9.x stable release to its full commit hash.
+The release includes the gfxcapture <system_error> fix required by
+current libc++, without following unreleased master changes.
 ---
  packages/ffmpeg.cmake | 3 +++
  1 file changed, 3 insertions(+)
@@ -20,8 +19,8 @@ index 252c687..ef6d5c2 100644
      GIT_REPOSITORY https://github.com/FFmpeg/FFmpeg.git
      SOURCE_DIR ${SOURCE_LOCATION}
 +    GIT_REMOTE_NAME origin
-+    GIT_TAG release/8.1
-+    GIT_RESET 38b88335f99e76ed89ff3c93f877fdefce736c13 # n8.1.2
++    GIT_TAG release/9.0
++    GIT_RESET 946fcce07b6dcd0331c8cc609192aeff5e1924f8 # n9.0.2
      GIT_CLONE_FLAGS "--sparse --filter=tree:0"
      GIT_CLONE_POST_COMMAND "sparse-checkout set --no-cone /* !tests/ref/fate"
      UPDATE_COMMAND ""
