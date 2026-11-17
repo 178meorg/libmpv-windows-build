@@ -114,5 +114,3 @@ index d175b02..893d84e 100644
          -Dvapoursynth=enabled
          # -Dsubrandr=enabled
          -Dsixel=disabled
--- 
-2.56.1
