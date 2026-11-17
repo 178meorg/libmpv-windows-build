@@ -1,24 +1,23 @@
-From 3f9e0fd0c3e3a2b4b2e743f4d53d3c0d7d5c9a11 Mon Sep 17 00:00:00 2001
+From 7192a1bc1020087e0b7dcca15ac03aa4771fe299 Mon Sep 17 00:00:00 2001
 From: codex <codex-ice@gmail.com>
-Date: Wed, 13 May 2026 23:55:00 +0800
-Subject: [PATCH] mpv: disable sixel and subrandr support
+Date: Tue, 17 Nov 2026 10:45:28 +0800
+Subject: [PATCH] mpv: use custom fork and disable unsupported optional
+ features
 
-libsixel is currently failing to build in CI, which blocks the default
-64-bit mpv package even though sixel is an optional output path. Stop
-depending on libsixel and configure mpv without sixel support until the
-upstream package recipe is fixed. The mpv source used by this build may
-not include upstream master's post-0.41.0 subrandr Meson option, so stop
-depending on subrandr and stop passing the option to Meson.
+Build 178meorg/mpv while preserving its mpv 0.41-compatible options.
+Disable the failing libsixel dependency and omit the newer subrandr and
+libcurl Meson options that this fork does not provide.
 ---
- packages/mpv-release.cmake | 8 ++++----
- packages/mpv.cmake         | 10 +++++-----
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ packages/mpv-release.cmake |  8 ++++----
+ packages/mpv.cmake         | 11 +++++------
+ 2 files changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/packages/mpv-release.cmake b/packages/mpv-release.cmake
-index 8f38f5a..cfb7bfe 100644
+index f9f869a..443efbc 100644
 --- a/packages/mpv-release.cmake
 +++ b/packages/mpv-release.cmake
-@@ -38,7 +38,7 @@ ExternalProject_Add(mpv-release
+@@ -37,8 +37,8 @@ ExternalProject_Add(mpv-release
+         spirv-cross
          vapoursynth
          libsdl2
 -        subrandr
@@ -28,7 +27,8 @@ index 8f38f5a..cfb7bfe 100644
      URL ${LINK}
      SOURCE_DIR ${SOURCE_LOCATION}
      CONFIGURE_COMMAND ${EXEC} CONF=1 meson setup <BINARY_DIR> <SOURCE_DIR>
-@@ -68,7 +68,7 @@ ExternalProject_Add(mpv-release
+@@ -67,8 +67,8 @@ ExternalProject_Add(mpv-release
+         -Dspirv-cross=enabled
          -Dvulkan=enabled
          -Dvapoursynth=enabled
 -        -Dsubrandr=enabled
@@ -39,21 +39,25 @@ index 8f38f5a..cfb7bfe 100644
          -Dc_args='-Wno-error=int-conversion'
      BUILD_COMMAND ${EXEC} LTO_JOB=1 ninja -C <BINARY_DIR>
 diff --git a/packages/mpv.cmake b/packages/mpv.cmake
-index 8624aec..6a3e8c6 100644
+index a2954d5..5f64438 100644
 --- a/packages/mpv.cmake
 +++ b/packages/mpv.cmake
-@@ -23,7 +23,7 @@ ExternalProject_Add(mpv
+@@ -22,10 +22,10 @@ ExternalProject_Add(mpv
+         spirv-cross
          vapoursynth
          libsdl2
 -        subrandr
 -        libsixel
 +        # subrandr
 +        # libsixel
+         curl
 -    GIT_REPOSITORY https://github.com/mpv-player/mpv.git
 +    GIT_REPOSITORY https://github.com/178meorg/mpv.git
      SOURCE_DIR ${SOURCE_LOCATION}
      GIT_CLONE_FLAGS "--filter=tree:0"
-@@ -55,7 +55,7 @@ ExternalProject_Add(mpv
+     UPDATE_COMMAND ""
+@@ -55,10 +55,9 @@ ExternalProject_Add(mpv
+         -Dspirv-cross=enabled
          -Dvulkan=enabled
          -Dvapoursynth=enabled
 -        -Dsubrandr=enabled
@@ -61,7 +65,9 @@ index 8624aec..6a3e8c6 100644
 +        # -Dsubrandr=enabled
 +        -Dsixel=disabled
          ${mpv_gl}
+-        -Dlibcurl=enabled
          -Dc_args='-Wno-error=int-conversion'
      BUILD_COMMAND ${EXEC} LTO_JOB=1 PDB=1 ninja -C <BINARY_DIR>
+     INSTALL_COMMAND ""
 -- 
-2.52.0
+2.56.1
