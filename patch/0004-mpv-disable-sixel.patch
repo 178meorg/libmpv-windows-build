@@ -4,9 +4,9 @@ Date: Tue, 17 Nov 2026 10:45:28 +0800
 Subject: [PATCH] mpv: use custom fork and disable unsupported optional
  features
 
-Build 178meorg/mpv while preserving its mpv 0.41-compatible options.
-Disable the failing libsixel dependency and omit the newer subrandr and
-libcurl Meson options that this fork does not provide.
+Build 178meorg/mpv with the existing optional-feature profile.
+Keep libsixel and subrandr disabled, and leave libcurl auto-detected.
+This profile also supports the older mpv 0.41-based fork.
 ---
  packages/mpv-release.cmake |  8 ++++----
  packages/mpv.cmake         | 11 +++++------
