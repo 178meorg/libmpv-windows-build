@@ -29,6 +29,12 @@ Later `toolchain` and `MPV` runs prefer the GitHub Actions cache. If the cache i
 > 
 > I'm not a lawyer and can't guarantee that I've disabled all LGPL-incompatible packages, use at your own risk.
 
+### Windows rendering profile
+
+The build enables OpenGL/ANGLE and the existing D3D11/CUDA paths. Vulkan rendering is disabled in mpv, libplacebo, SDL and FFmpeg; the FFmpeg `libplacebo` filter is disabled because it requires Vulkan. mpv still uses libplacebo for its shaders and color processing. Vulkan headers remain available for shader compilation.
+
+Every libmpv DLL is checked before packaging to reject Vulkan Runtime DLL imports. A Windows build must load without a separately installed Vulkan Runtime.
+
 ### Release Retention Policy
 
 -   The last 30 days of builds will be retained.

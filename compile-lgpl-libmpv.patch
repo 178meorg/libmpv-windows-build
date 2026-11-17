@@ -1,6 +1,6 @@
-From 03f6ebfe7bac33658a31d87d372c58be163323a8 Mon Sep 17 00:00:00 2001
+From 41b6557ade246345b06b875b4c3fa50b37b254d4 Mon Sep 17 00:00:00 2001
 From: zhongfly <11155705+zhongfly@users.noreply.github.com>
-Date: Thu, 14 May 2026 21:55:52 +0800
+Date: Tue, 17 Nov 2026 15:47:28 +0800
 Subject: [PATCH] packages: compile lgpl libmpv
 
 ---
@@ -28,7 +28,7 @@ index e062242..0154cf5 100644
      set(rust_target "gnullvm")
      set(vapoursynth_pkgconfig_libs "-lVapourSynth -Wl,-delayload=VapourSynth.dll")
 diff --git a/packages/ffmpeg.cmake b/packages/ffmpeg.cmake
-index 2e6ecc0..165a162 100644
+index 3b918e9..11c44fc 100644
 --- a/packages/ffmpeg.cmake
 +++ b/packages/ffmpeg.cmake
 @@ -1,18 +1,13 @@
@@ -88,7 +88,7 @@ index 2e6ecc0..165a162 100644
          --enable-libfreetype
          --enable-libfribidi
          --enable-libfontconfig
-@@ -81,26 +67,19 @@ ExternalProject_Add(ffmpeg
+@@ -81,27 +67,20 @@ ExternalProject_Add(ffmpeg
          --enable-libspeex
          --enable-libvorbis
          --enable-libbs2b
@@ -110,7 +110,8 @@ index 2e6ecc0..165a162 100644
 -        --enable-libsrt
          --enable-libvpl
          --enable-libjxl
-         --enable-libplacebo
+         --disable-libplacebo
+         --disable-vulkan
 -        --enable-libzvbi
          --enable-libaribcaption
          --enable-cuda-llvm
@@ -137,7 +138,7 @@ index 39f0396..7902fab 100644
          -DENABLE_CPIO=OFF
          -DENABLE_CAT=OFF
 diff --git a/packages/mpv.cmake b/packages/mpv.cmake
-index 3ff8a52..a8139bb 100644
+index 893d84e..56cbe5d 100644
 --- a/packages/mpv.cmake
 +++ b/packages/mpv.cmake
 @@ -6,15 +6,11 @@ ExternalProject_Add(mpv
@@ -154,9 +155,9 @@ index 3ff8a52..a8139bb 100644
          uchardet
 -        openal-soft
          mujs
-         vulkan
+         vulkan-header
          shaderc
-@@ -35,23 +31,25 @@ ExternalProject_Add(mpv
+@@ -38,23 +34,25 @@ ExternalProject_Add(mpv
          --cross-file=${MESON_CROSS}
          --default-library=shared
          --prefer-static
@@ -184,9 +185,9 @@ index 3ff8a52..a8139bb 100644
 -        -Dopenal=enabled
 +        -Dopenal=disabled
          -Dspirv-cross=enabled
-         -Dvulkan=enabled
+         -Dvulkan=disabled
          -Dvapoursynth=enabled
-@@ -72,13 +70,6 @@ ExternalProject_Add_Step(mpv strip-binary
+@@ -75,13 +73,6 @@ ExternalProject_Add_Step(mpv strip-binary
  
  ExternalProject_Add_Step(mpv copy-binary
      DEPENDEES strip-binary
@@ -200,7 +201,7 @@ index 3ff8a52..a8139bb 100644
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv-2.dll          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv-2.dll
      COMMAND ${CMAKE_COMMAND} -E copy <BINARY_DIR>/libmpv.dll.a          ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/libmpv.dll.a
      COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include/mpv ${CMAKE_CURRENT_BINARY_DIR}/mpv-dev/include/mpv
-@@ -95,14 +86,9 @@ mv $2 $2-git-\${GIT}")
+@@ -98,14 +89,9 @@ mv $2 $2-git-\${GIT}")
  ExternalProject_Add_Step(mpv copy-package-dir
      DEPENDEES copy-binary
      COMMAND chmod 755 ${RENAME}
@@ -219,4 +220,3 @@ index 3ff8a52..a8139bb 100644
  )
 -- 
 2.56.1
-

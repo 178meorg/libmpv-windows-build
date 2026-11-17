@@ -1,0 +1,118 @@
+From 113a82981d4550682f17ec346cf99673d06cedae Mon Sep 17 00:00:00 2001
+From: codex <codex-ice@gmail.com>
+Date: Tue, 17 Nov 2026 15:47:28 +0800
+Subject: [PATCH] windows: use OpenGL and disable Vulkan backends
+
+Disable Vulkan in mpv, libplacebo, SDL and FFmpeg. Keep OpenGL, D3D11 and CUDA paths, and retain Vulkan headers for shader compilation without building the runtime loader.
+---
+ packages/ffmpeg.cmake      | 3 ++-
+ packages/libplacebo.cmake  | 5 ++++-
+ packages/libsdl2.cmake     | 4 ++--
+ packages/mpv-release.cmake | 4 ++--
+ packages/mpv.cmake         | 4 ++--
+ 5 files changed, 12 insertions(+), 8 deletions(-)
+
+diff --git a/packages/ffmpeg.cmake b/packages/ffmpeg.cmake
+index 3a4e4f7..3b918e9 100644
+--- a/packages/ffmpeg.cmake
++++ b/packages/ffmpeg.cmake
+@@ -99,7 +99,8 @@ ExternalProject_Add(ffmpeg
+         --enable-libsrt
+         --enable-libvpl
+         --enable-libjxl
+-        --enable-libplacebo
++        --disable-libplacebo
++        --disable-vulkan
+         --enable-libzvbi
+         --enable-libaribcaption
+         --enable-cuda-llvm
+diff --git a/packages/libplacebo.cmake b/packages/libplacebo.cmake
+index b5797dc..44f33c0 100644
+--- a/packages/libplacebo.cmake
++++ b/packages/libplacebo.cmake
+@@ -2,7 +2,7 @@ get_property(src_glad TARGET glad PROPERTY _EP_SOURCE_DIR)
+ get_property(src_fast_float TARGET fast_float PROPERTY _EP_SOURCE_DIR)
+ ExternalProject_Add(libplacebo
+     DEPENDS
+-        vulkan
++        vulkan-header
+         shaderc
+         spirv-cross
+         lcms2
+@@ -25,6 +25,9 @@ ExternalProject_Add(libplacebo
+         --cross-file=${MESON_CROSS}
+         --default-library=static
+         -Dd3d11=enabled
++        -Dopengl=enabled
++        -Dvulkan=disabled
++        -Dvk-proc-addr=disabled
+         -Ddebug=true
+         -Db_ndebug=true
+         -Doptimization=3
+diff --git a/packages/libsdl2.cmake b/packages/libsdl2.cmake
+index f84e5dd..84a42be 100644
+--- a/packages/libsdl2.cmake
++++ b/packages/libsdl2.cmake
+@@ -1,6 +1,6 @@
+ ExternalProject_Add(libsdl2
+     DEPENDS
+-        vulkan
++        vulkan-header
+         libiconv
+     GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
+     SOURCE_DIR ${SOURCE_LOCATION}
+@@ -16,7 +16,7 @@ ExternalProject_Add(libsdl2
+         -DCMAKE_INSTALL_PREFIX=${MINGW_INSTALL_PREFIX}
+         -DCMAKE_FIND_ROOT_PATH=${MINGW_INSTALL_PREFIX}
+         -DBUILD_SHARED_LIBS=OFF
+-        -DSDL_VULKAN=ON
++        -DSDL_VULKAN=OFF
+         -DSDL_TEST=OFF
+         -DSDL_TEST_LIBRARY=OFF
+     BUILD_COMMAND ${EXEC} ninja -C <BINARY_DIR>
+diff --git a/packages/mpv-release.cmake b/packages/mpv-release.cmake
+index 443efbc..45faecd 100644
+--- a/packages/mpv-release.cmake
++++ b/packages/mpv-release.cmake
+@@ -31,7 +31,7 @@ ExternalProject_Add(mpv-release
+         uchardet
+         openal-soft
+         mujs
+-        vulkan
++        vulkan-header
+         shaderc
+         libplacebo
+         spirv-cross
+@@ -65,7 +65,7 @@ ExternalProject_Add(mpv-release
+         -Dlcms2=enabled
+         -Dopenal=enabled
+         -Dspirv-cross=enabled
+-        -Dvulkan=enabled
++        -Dvulkan=disabled
+         -Dvapoursynth=enabled
+         # -Dsubrandr=enabled
+         -Dsixel=disabled
+diff --git a/packages/mpv.cmake b/packages/mpv.cmake
+index d175b02..893d84e 100644
+--- a/packages/mpv.cmake
++++ b/packages/mpv.cmake
+@@ -16,7 +16,7 @@ ExternalProject_Add(mpv
+         uchardet
+         openal-soft
+         mujs
+-        vulkan
++        vulkan-header
+         shaderc
+         libplacebo
+         spirv-cross
+@@ -56,7 +56,7 @@ ExternalProject_Add(mpv
+         -Dlcms2=enabled
+         -Dopenal=enabled
+         -Dspirv-cross=enabled
+-        -Dvulkan=enabled
++        -Dvulkan=disabled
+         -Dvapoursynth=enabled
+         # -Dsubrandr=enabled
+         -Dsixel=disabled
+-- 
+2.56.1

@@ -2,6 +2,7 @@
 set -x
 
 main() {
+    runtime_checker="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/check-libmpv-runtime.sh"
     gitdir=$(pwd)
     clang_root=$(pwd)/clang_root
     buildroot=$(pwd)
@@ -129,6 +130,10 @@ zip() {
     local bit=$1
     local arch=$2
     local x86_64_level=$3
+    local inspect_tool="objdump"
+    if [[ -x "$clang_root/bin/llvm-objdump" ]]; then
+        inspect_tool="$clang_root/bin/llvm-objdump"
+    fi
 
     mv $buildroot/build$bit/mpv-* $gitdir/release
     if [ "$simple_package" != "true" ]; then
@@ -138,6 +143,9 @@ zip() {
     cd $gitdir/release
     for dir in ./mpv*$arch$x86_64_level*; do
         if [ -d $dir ]; then
+            if [[ -f "$dir/libmpv-2.dll" ]]; then
+                LIBMPV_OBJDUMP="$inspect_tool" bash "$runtime_checker" "$dir/libmpv-2.dll" || exit 1
+            fi
             7z a -m0=lzma2 -mx=9 -ms=on $dir.7z $dir/* -x!*.7z
             rm -rf $dir
         fi
