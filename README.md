@@ -8,11 +8,17 @@ Use Github Action to build mpv for Windows with latest commit.
 
 Based on <https://github.com/shinchiro/mpv-winbuild-cmake>.
 
-## Auto-Builds
+## Builds
 
-Checks the mpv repository every hour for updates. If there is an update and it is relevant to the windows build, it will automatically run the compilation and **release it on success**.
+Run the `MPV` workflow manually on `master`. Choose `64bit` and enable `Also build lgpl libmpv` for the LGPL development package; enable `Publish a release` to publish the resulting package.
 
-This repo only provides 64-bit version. If you need a 32-bit version, you can fork this repo and run `MPV` workflow by yourself.
+Prepare LLVM once with the workflow below before using the Clang build. The player workflow reuses that compiler instead of compiling host LLVM on a cache miss.
+
+### LLVM Toolchain
+
+Run the `LLVM` workflow once with `Publish LLVM toolchain to GitHub Release` and `Trigger toolchain build action after success build` enabled. Leave `Trigger mpv build action after toolchain build` disabled to prepare the compiler without starting a player build. The workflow packages `clang_root`, publishes it to the `llvm-toolchain` prerelease, and uploads a SHA256 checksum; the following `toolchain` run caches the Windows sysroot.
+
+Later `toolchain` and `MPV` runs prefer the GitHub Actions cache. If the cache is unavailable, they download and verify the toolchain from that release instead of rebuilding LLVM. A clean player build still reuses this compiler. Run `LLVM` again when you want to refresh the compiler.
 
 > [!NOTE]
 > `mpv-dev-xxxx.7z` is libmpv, including the `libmpv-2.dll` file.
@@ -89,7 +95,7 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   subrandr [![subrandr](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fafishhh%2Fsubrandr%2Fmaster&cacheSeconds=1800)](https://github.com/afishhh/subrandr)
     -   svtav1 [![svtav1](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FAOMediaCodec%2FSVT-AV1&cacheSeconds=1800)](https://github.com/AOMediaCodec/SVT-AV1)
     -   uavs3d [![uavs3d](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fuavs3%2Fuavs3d&cacheSeconds=1800)](https://github.com/uavs3/uavs3d)
-    -   uchardet [![uchardet](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgitlab%2Fgitlab.freedesktop.org%2Fuchardet%2Fuchardet&cacheSeconds=1800)](https://gitlab.freedesktop.org/uchardet/uchardet)
+    -   uchardet ([v0.0.8](https://gitlab.freedesktop.org/uchardet/uchardet/-/tags/v0.0.8), pinned for Windows GB18030 subtitle compatibility)
     -   vorbis [![vorbis](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2Fxiph%2Fvorbis&cacheSeconds=1800)](https://github.com/xiph/vorbis) 
     -   vulkan [![Vulkan](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FKhronosGroup%2FVulkan-Loader%2Fmain&cacheSeconds=1800)](https://github.com/KhronosGroup/Vulkan-Loader) 
     -   vulkan-header [![Vulkan-Headers](https://img.shields.io/endpoint?url=https%3A%2F%2Flatest-commit-badgen.vercel.app%2Fgithub%2FKhronosGroup%2FVulkan-Headers%2Fmain&cacheSeconds=1800)](https://github.com/KhronosGroup/Vulkan-Headers)
@@ -104,6 +110,5 @@ same as [shinchiro](https://github.com/shinchiro/mpv-winbuild-cmake/blob/master/
     -   [libopenmpt](https://lib.openmpt.org/libopenmpt/download/) (0.8.10)
     -   [libiconv](https://ftp.gnu.org/pub/gnu/libiconv/) (1.19.1)
     -   [vapoursynth](https://github.com/vapoursynth/vapoursynth)  ![](https://img.shields.io/github/v/release/vapoursynth/vapoursynth?style=flat-square&cacheSeconds=1800)
-
 
 

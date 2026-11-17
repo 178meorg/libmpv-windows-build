@@ -66,8 +66,29 @@ build() {
 
     if [ "$compiler" == "gcc" ] && [ ! -f "$buildroot/build$bit/install/bin/cross-gcc" ]; then
         ninja -C $buildroot/build$bit gcc && rm -rf $buildroot/build$bit/toolchain
-    elif [ "$compiler" == "clang" ] && [ ! "$(ls -A $clang_root/bin/clang)" ]; then
-        ninja -C $buildroot/build$bit llvm && ninja -C $buildroot/build$bit llvm-clang
+    elif [ "$compiler" == "clang" ]; then
+        local target_prefix="$arch-w64-mingw32"
+        local target_sysroot="$buildroot/build$bit/install/$target_prefix"
+
+        if [ ! -x "$clang_root/bin/clang" ]; then
+            echo "Prebuilt LLVM toolchain is missing: $clang_root/bin/clang"
+            echo "Run the LLVM workflow to publish the ${LLVM_RELEASE_TAG:-llvm-toolchain} release first."
+            exit 1
+        fi
+
+        local compiler_resource_dir
+        compiler_resource_dir=$("$clang_root/bin/clang" --print-resource-dir) || exit 1
+        if [ ! -x "$clang_root/bin/$target_prefix-clang" ] || \
+           [ ! -x "$clang_root/bin/$target_prefix-ar" ] || \
+           [ ! -f "$compiler_resource_dir/lib/$arch-pc-windows-gnu/libclang_rt.builtins.a" ] || \
+           [ ! -f "$target_sysroot/include/windows.h" ] || \
+           [ ! -f "$target_sysroot/lib/libc++.a" ]; then
+            cmake --build "$buildroot/build$bit" --target llvm-download || exit 1
+            # A native LLVM release can be combined with an existing sysroot
+            # cache whose stamps refer to cross tools no longer in clang_root.
+            ninja -C "$buildroot/build$bit" llvm-wrapper-fullclean llvm-compiler-rt-builtin-fullclean || exit 1
+            ninja -C "$buildroot/build$bit" llvm-clang || exit 1
+        fi
     fi
 
     if [[ ! "$(ls -A $buildroot/install_rustup/.cargo/bin)" ]]; then
@@ -76,18 +97,20 @@ build() {
     fi
     ninja -C $buildroot/build$bit update
 
-    # Pinned sources can change while restored build stamps still refer to the
-    # previous FFmpeg. Invalidate those stamps before reusing installed libraries.
-    local ffmpeg_commit ffmpeg_built_commit
-    ffmpeg_commit=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$gitdir/packages/ffmpeg.cmake")
-    if [[ ! "$ffmpeg_commit" =~ ^[0-9a-f]{40}$ ]]; then
-        echo "Invalid FFmpeg commit pin: $ffmpeg_commit" >&2
-        exit 1
-    fi
-    ffmpeg_built_commit=$(cat "$buildroot/build$bit/packages/ffmpeg-prefix/src/ffmpeg-stamp/HEAD" 2>/dev/null || true)
-    if [[ "$ffmpeg_built_commit" != "$ffmpeg_commit" ]]; then
-        ninja -C "$buildroot/build$bit" ffmpeg-fullclean || exit 1
-    fi
+    # A changed pin must invalidate restored build stamps before mpv links the
+    # corresponding static library. Matching pins keep their dependency cache.
+    local package_name pinned_commit built_commit
+    for package_name in ffmpeg uchardet; do
+        pinned_commit=$(awk '$1 == "GIT_RESET" { print $2; exit }' "$gitdir/packages/$package_name.cmake")
+        if [[ ! "$pinned_commit" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Invalid $package_name commit pin: $pinned_commit" >&2
+            exit 1
+        fi
+        built_commit=$(cat "$buildroot/build$bit/packages/$package_name-prefix/src/$package_name-stamp/HEAD" 2>/dev/null || true)
+        if [[ "$built_commit" != "$pinned_commit" ]]; then
+            ninja -C "$buildroot/build$bit" "$package_name-fullclean" || exit 1
+        fi
+    done
     ninja -C $buildroot/build$bit mpv-fullclean
     
     ninja -C $buildroot/build$bit mpv

@@ -1,0 +1,26 @@
+From 71a97624f0e6b452cb15daed15c6a4c674c79281 Mon Sep 17 00:00:00 2001
+From: codex <codex-ice@gmail.com>
+Date: Thu, 3 Sep 2026 10:30:00 +0800
+Subject: [PATCH] uchardet: pin to v0.0.8
+
+The unreleased master branch can rank invalid GB18030 subtitle data as
+UTF-8. Pin the last stable release, which identifies the affected input as
+GB18030, so mpv can recode it through iconv.
+---
+ packages/uchardet.cmake | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/packages/uchardet.cmake b/packages/uchardet.cmake
+index f354258..0990266 100644
+--- a/packages/uchardet.cmake
++++ b/packages/uchardet.cmake
+@@ -1,6 +1,9 @@
+ ExternalProject_Add(uchardet
+     GIT_REPOSITORY https://gitlab.freedesktop.org/uchardet/uchardet.git
+     SOURCE_DIR ${SOURCE_LOCATION}
++    GIT_REMOTE_NAME origin
++    GIT_TAG master
++    GIT_RESET ae6302a016088ad07177f86d417b20010053632b # v0.0.8
+     GIT_CLONE_FLAGS "--filter=tree:0"
+     UPDATE_COMMAND ""
+     CONFIGURE_COMMAND ${EXEC} CONF=1 cmake -H<SOURCE_DIR> -B<BINARY_DIR>

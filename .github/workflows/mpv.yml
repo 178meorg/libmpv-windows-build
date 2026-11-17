@@ -1,6 +1,10 @@
 name: MPV
 run-name: "${{ inputs.run_name != '' && format('{0} ({1})', inputs.run_name, inputs.compiler) || inputs.prs != '' && format('{0}[{2}] ({1})', github.workflow, inputs.compiler, inputs.prs) || format('{0} ({1})', github.workflow, inputs.compiler) }}"
 
+env:
+  LLVM_RELEASE_TAG: llvm-toolchain
+  LLVM_RELEASE_ASSET: llvm-linux-x86_64.tar.zst
+
 permissions:
   actions: write
   attestations: write
@@ -159,7 +163,7 @@ jobs:
           path: "*.patch"
 
   validate_ffmpeg:
-    name: Validate pinned FFmpeg
+    name: Validate pinned dependencies
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -214,6 +218,25 @@ jobs:
 
           echo "Validated FFmpeg $ffmpeg_version ($ffmpeg_commit) on $ffmpeg_branch."
 
+      - name: Verify uchardet release pin
+        shell: bash
+        run: |
+          set -euo pipefail
+          uchardet_cmake="mpv-winbuild-cmake/packages/uchardet.cmake"
+          uchardet_repo="$(awk '$1 == "GIT_REPOSITORY" { print $2; exit }' "$uchardet_cmake")"
+          uchardet_commit="$(awk '$1 == "GIT_RESET" { print $2; exit }' "$uchardet_cmake")"
+          uchardet_version="$(awk '$1 == "GIT_RESET" && $3 == "#" { print $4; exit }' "$uchardet_cmake")"
+          if [[ ! "$uchardet_commit" =~ ^[0-9a-f]{40}$ || "$uchardet_version" != "v0.0.8" ]]; then
+            echo "Invalid uchardet compatibility pin" >&2
+            exit 1
+          fi
+          tag_commit="$(git ls-remote --exit-code "$uchardet_repo" "refs/tags/$uchardet_version^{}" | awk 'NR == 1 { print $1 }')"
+          if [[ "$tag_commit" != "$uchardet_commit" ]]; then
+            echo "$uchardet_version resolves to $tag_commit, expected $uchardet_commit" >&2
+            exit 1
+          fi
+          echo "Validated uchardet $uchardet_version ($uchardet_commit)."
+
   build_mpv:
     name: Build MPV
     needs: [params, validate_ffmpeg]
@@ -230,7 +253,7 @@ jobs:
           sudo pacman-key --init
           sudo pacman-key --populate archlinux
           sudo pacman -Syu --noconfirm
-          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld libc++ unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache python-pip 7zip shaderc
+          sudo pacman -S --noconfirm --needed git ninja cmake meson clang lld libc++ unzip ragel yasm nasm gperf rst2pdf lib32-gcc-libs lib32-glib2 python-cairo curl wget mimalloc ccache python-pip 7zip shaderc zstd
           sudo python -m pip install --break-system-packages roman
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -307,12 +330,39 @@ jobs:
 
       - name: Restore clang sysroot cache
         if: ${{ inputs.compiler =='clang' }}
+        id: restore_clang_root
         uses: actions/cache/restore@v6.1.0
         with: 
           path: ${{ github.workspace }}/mpv-winbuild-cmake/clang_root
           key: ${{ matrix.bit }}-clang_root-${{ env.key_suffix }}
           restore-keys: |
             ${{ matrix.bit }}-clang_root-${{ env.restore_suffix }}
+
+      - name: Download LLVM toolchain release
+        if: ${{ inputs.compiler == 'clang' && steps.restore_clang_root.outputs.cache-matched-key == '' }}
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          download_dir="$RUNNER_TEMP/llvm-toolchain"
+          release_url="https://github.com/${GITHUB_REPOSITORY}/releases/download/${LLVM_RELEASE_TAG}"
+          mkdir -p "$download_dir"
+
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --output "$download_dir/$LLVM_RELEASE_ASSET" \
+            "$release_url/$LLVM_RELEASE_ASSET"
+          curl --fail --location --silent --show-error --retry 5 --retry-all-errors \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --output "$download_dir/$LLVM_RELEASE_ASSET.sha256" \
+            "$release_url/$LLVM_RELEASE_ASSET.sha256"
+
+          cd "$download_dir"
+          sha256sum --check "$LLVM_RELEASE_ASSET.sha256"
+          rm -rf "$GITHUB_WORKSPACE/mpv-winbuild-cmake/clang_root"
+          tar --zstd -xf "$LLVM_RELEASE_ASSET" -C "$GITHUB_WORKSPACE/mpv-winbuild-cmake"
+          "$GITHUB_WORKSPACE/mpv-winbuild-cmake/clang_root/bin/clang" --version | head -n 1
 
       - name: Restore Rust Cache
         uses: actions/cache/restore@v6.1.0
